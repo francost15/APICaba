@@ -37,10 +37,9 @@ jobs:
       - name: Create a temporary directory for packaging
         run: mkdir temp
 
-      - name: Copy files to temporary directory
+      - name: Copy files to temporary directory, excluding temp and venv
         run: |
-          cp -r ./* temp/
-          rm -rf temp/venv temp/__pycache__  # Eliminar venv y __pycache__
+          rsync -av --exclude 'venv/' --exclude '__pycache__/' ./ temp/
 
       - name: Create tar artifact for deployment
         run: |
