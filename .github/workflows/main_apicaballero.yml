@@ -34,9 +34,17 @@ jobs:
         
       # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
 
+      - name: Create a temporary directory for packaging
+        run: mkdir temp
+
+      - name: Copy files to temporary directory
+        run: |
+          cp -r ./* temp/
+          rm -rf temp/venv temp/__pycache__  # Eliminar venv y __pycache__
+
       - name: Create tar artifact for deployment
         run: |
-          tar -czf release.tar.gz --exclude=venv --exclude=__pycache__ .  # Excluye venv y __pycache__
+          tar -czf release.tar.gz -C temp .
 
       - name: Upload artifact for deployment jobs
         uses: actions/upload-artifact@v4
