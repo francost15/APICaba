@@ -1,15 +1,24 @@
 import logging
+import os
 from sqlalchemy import create_engine, MetaData
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from databases import Database
+from dotenv import load_dotenv
+
+# Cargar las variables de entorno desde el archivo .env
+load_dotenv()
 
 # Configurar el logger
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Actualiza la URL de la base de datos con tus credenciales
-DATABASE_URL = "mysql+mysqlconnector://uvp:Francost15@20.169.80.178:3306/shop_limpieza"
+# Obtener la URL de la base de datos desde la variable de entorno
+DATABASE_URL = os.getenv("DATABASE_URL")
+
+# Asegúrate de que DATABASE_URL no sea None
+if DATABASE_URL is None:
+    raise ValueError("DATABASE_URL no está configurada en el archivo .env")
 
 database = Database(DATABASE_URL)
 metadata = MetaData()
