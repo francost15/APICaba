@@ -19,6 +19,10 @@ async def shutdown():
     await disconnect_db()
     logger.info("API detenida y conexión a la base de datos cerrada.")
 
+@app.get("/")
+async def read_item():
+    return {"message":"Bienvenido"}
+
 app.include_router(cliente.router)
 app.include_router(carrito_compras.router)
 app.include_router(detalle_carrito.router)
