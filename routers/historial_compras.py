@@ -1,12 +1,16 @@
 from fastapi import APIRouter, HTTPException, Depends
 from model.historial_compras import HistorialComprasCreate, HistorialComprasUpdate, HistorialComprasInDB, HistorialCompras
 from db import database
+import random
 
 router = APIRouter()
 
 @router.post("/historial_compras/", response_model=HistorialComprasInDB)
 async def crear_historial(historial: HistorialComprasCreate):
+    # Generar un ID aleatorio para el historial de compras
+    id_historial = random.randint(1, 1000000)
     query = HistorialCompras.insert().values(
+        id_historial=id_historial,
         id_cliente=historial.id_cliente,
         id_pedido=historial.id_pedido,
         total_compra=historial.total_compra,
@@ -14,8 +18,8 @@ async def crear_historial(historial: HistorialComprasCreate):
         empleado_mod=historial.empleado_mod
     )
     try:
-        last_record_id = await database.execute(query)
-        historial_creado = await database.fetch_one(HistorialCompras.select().where(HistorialCompras.c.id_historial == last_record_id))
+        await database.execute(query)
+        historial_creado = await database.fetch_one(HistorialCompras.select().where(HistorialCompras.c.id_historial == id_historial))
         return historial_creado
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al crear el historial de compras: {str(e)}")

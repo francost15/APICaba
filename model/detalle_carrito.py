@@ -1,4 +1,5 @@
-from sqlalchemy import Table, Column, Integer, Float, ForeignKey, Enum,String
+from sqlalchemy import Table, Column, Integer, Float, ForeignKey, Enum, String
+import random
 from sqlalchemy.sql import func
 from db import metadata
 from pydantic import BaseModel
@@ -8,7 +9,7 @@ from typing import Optional
 DetalleCarrito = Table(
     "DetalleCarrito",
     metadata,
-    Column("id_detalle_carrito", Integer, primary_key=True),
+    Column("id_detalle_carrito", Integer, primary_key=True, default=lambda: random.randint(1, 1000000)),
     Column("id_carrito", Integer, ForeignKey("Carritos.id_carrito")),
     Column("id_producto", Integer, nullable=False),
     Column("cantidad", Integer, nullable=False),

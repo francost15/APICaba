@@ -2,6 +2,7 @@ from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime
 from sqlalchemy import Table, Column, Integer, String, DateTime, ForeignKey
+import random
 from sqlalchemy.sql import func
 from db import metadata
 
@@ -9,7 +10,7 @@ from db import metadata
 MetodoPago = Table(
     "MetodosPago",
     metadata,
-    Column("id_pago", Integer, primary_key=True),
+    Column("id_pago", Integer, primary_key=True, default=lambda: random.randint(1, 1000000)),
     Column("id_cliente", Integer, ForeignKey("Clientes.id_cliente")),
     Column("tipo_pago", String(50)),
     Column("nombre_titular", String(100)),

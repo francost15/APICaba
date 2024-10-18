@@ -1,13 +1,14 @@
 from pydantic import BaseModel
 from typing import Optional
 from sqlalchemy import Table, Column, Integer, String, Enum
+import random
 from db import metadata
 
 # Modelo SQLAlchemy para Roles
 Roles = Table(
     "Roles",
     metadata,
-    Column("id_rol", Integer, primary_key=True),
+    Column("id_rol", Integer, primary_key=True, default=lambda: random.randint(1, 1000000)),
     Column("nombre_rol", String(50), nullable=False),
     Column("status", Enum("activo", "inactivo"), default="activo"),
     Column("empleado_mod", String(100), nullable=True)

@@ -1,4 +1,5 @@
 from sqlalchemy import Table, Column, Integer, String, DateTime, Enum, ForeignKey, func
+import random
 from db import metadata, database  # Asegúrate de tener la conexión de la base de datos configurada
 from pydantic import BaseModel, Field, validator
 from typing import Optional
@@ -7,7 +8,7 @@ from typing import Optional
 Clientes = Table(
     "Clientes",
     metadata,
-    Column("id_cliente", Integer, primary_key=True, autoincrement=True),
+    Column("id_cliente", Integer, primary_key=True, default=lambda: random.randint(1, 1000000)),
     Column("id_usuario", Integer, ForeignKey("Usuarios.id_usuario"), nullable=False),
     Column("nombre", String(100), nullable=False),
     Column("apellidos", String(100), nullable=False),

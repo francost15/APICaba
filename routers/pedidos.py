@@ -1,12 +1,16 @@
 from fastapi import APIRouter, HTTPException
 from model.pedidos import PedidoCreate, PedidoUpdate, PedidoInDB, Pedidos
 from db import database
+import random
 
 router = APIRouter()
 
 @router.post("/pedidos/", response_model=PedidoInDB)
 async def crear_pedido(pedido: PedidoCreate):
+    # Generar un ID aleatorio para el pedido
+    id_pedido = random.randint(1, 1000000)
     query = Pedidos.insert().values(
+        id_pedido=id_pedido,
         id_cliente=pedido.id_cliente,
         total_pedido=pedido.total_pedido,
         estado_pedido=pedido.estado_pedido,
@@ -14,8 +18,8 @@ async def crear_pedido(pedido: PedidoCreate):
         empleado_mod=pedido.empleado_mod
     )
     try:
-        last_record_id = await database.execute(query)
-        pedido_creado = await database.fetch_one(Pedidos.select().where(Pedidos.c.id_pedido == last_record_id))
+        await database.execute(query)
+        pedido_creado = await database.fetch_one(Pedidos.select().where(Pedidos.c.id_pedido == id_pedido))
         return pedido_creado
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al crear el pedido: {str(e)}")

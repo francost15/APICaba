@@ -1,14 +1,23 @@
 from fastapi import APIRouter, HTTPException
 from model.login_seguridad import LoginSeguridadCreate, LoginSeguridadUpdate, LoginSeguridadInDB, LoginSeguridad
 from db import database
+import random
 
 router = APIRouter()
 
 @router.post("/login/", response_model=LoginSeguridadInDB)
 async def crear_login(login: LoginSeguridadCreate):
-    query = LoginSeguridad.insert().values(**login.dict())
-    last_record_id = await database.execute(query)
-    return await database.fetch_one(LoginSeguridad.select().where(LoginSeguridad.c.id_login == last_record_id))
+    # Generar un ID aleatorio para el login
+    id_login = random.randint(1, 1000000)
+    query = LoginSeguridad.insert().values(
+        id_login=id_login,
+        **login.dict()
+    )
+    try:
+        await database.execute(query)
+        return await database.fetch_one(LoginSeguridad.select().where(LoginSeguridad.c.id_login == id_login))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al crear el login: {str(e)}")
 
 @router.get("/login/{login_id}", response_model=LoginSeguridadInDB)
 async def leer_login(login_id: int):

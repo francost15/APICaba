@@ -1,15 +1,20 @@
 from fastapi import APIRouter, HTTPException
 from model.cliente import ClienteCreate, ClienteUpdate, ClienteInDB, Clientes
 from db import database
+import random
 
 router = APIRouter()
+
 @router.post("/clientes/", response_model=ClienteInDB)
 async def crear_cliente(cliente: ClienteCreate):
+    # Generar un ID aleatorio para el cliente
+    id_cliente = random.randint(1, 1000000)
     # Construcción de la consulta para insertar el nuevo cliente
     query = Clientes.insert().values(
+        id_cliente=id_cliente,
         id_usuario=cliente.id_usuario,
         nombre=cliente.nombre,
-        apellido=cliente.apellidos,
+        apellidos=cliente.apellidos,
         telefono=cliente.telefono,
         direccion=cliente.direccion,
         status=cliente.status,
@@ -17,13 +22,12 @@ async def crear_cliente(cliente: ClienteCreate):
     )
     try:
         # Ejecutar la consulta e insertar el nuevo cliente
-        last_record_id = await database.execute(query)
+        await database.execute(query)
         # Devolver el cliente creado con el id generado
-        return {**cliente.dict(), "id_cliente": last_record_id}
+        return {**cliente.dict(), "id_cliente": id_cliente}
     except Exception as e:
         # Manejo de errores y devolución de la excepción
         raise HTTPException(status_code=500, detail=f"Error al crear el cliente: {str(e)}")
-
 
 @router.get("/clientes/{cliente_id}", response_model=ClienteInDB)
 async def leer_cliente(cliente_id: int):
@@ -46,7 +50,7 @@ async def actualizar_cliente(cliente_id: int, cliente: ClienteUpdate):
     if db_cliente is None:
         raise HTTPException(status_code=404, detail="Cliente no encontrado")
     
-    # Update only the fields that are provided
+    # Actualizar solo los campos proporcionados
     update_data = {k: v for k, v in cliente.dict(exclude_unset=True).items()}
     update_query = Clientes.update().where(Clientes.c.id_cliente == cliente_id).values(**update_data)
     await database.execute(update_query)

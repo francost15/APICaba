@@ -1,3 +1,4 @@
+import random
 from fastapi import APIRouter, HTTPException
 from model.carrito_compras import CarritoComprasCreate, CarritoComprasUpdate, CarritoComprasInDB, CarritoCompras
 from db import database
@@ -6,7 +7,9 @@ router = APIRouter()
 
 @router.post("/carritos/", response_model=CarritoComprasInDB)
 async def crear_carrito(carrito: CarritoComprasCreate):
+    id_carrito = random.randint(1, 1000000)
     query = CarritoCompras.insert().values(
+        id_carrito=id_carrito,
         id_cliente=carrito.id_cliente,
         fecha_creacion=carrito.fecha_creacion,
         total=carrito.total,
@@ -15,8 +18,8 @@ async def crear_carrito(carrito: CarritoComprasCreate):
         empleado_mod=carrito.empleado_mod
     )
     try:
-        last_record_id = await database.execute(query)
-        return {**carrito.dict(), "id_carrito": last_record_id}
+        await database.execute(query)
+        return {**carrito.dict(), "id_carrito": id_carrito}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al crear el carrito: {str(e)}")
 

@@ -1,12 +1,16 @@
 from fastapi import APIRouter, HTTPException, Depends
 from model.detalle_pedido import DetallePedidoCreate, DetallePedidoUpdate, DetallePedidoInDB, DetallesPedido
 from db import database
+import random
 
 router = APIRouter()
 
 @router.post("/detalles_pedido/", response_model=DetallePedidoInDB)
 async def crear_detalle_pedido(detalle: DetallePedidoCreate):
+    # Generar un ID aleatorio para el detalle del pedido
+    id_detalle_pedido = random.randint(1, 1000000)
     query = DetallesPedido.insert().values(
+        id_detalle_pedido=id_detalle_pedido,
         id_pedido=detalle.id_pedido,
         id_producto=detalle.id_producto,
         id_pago=detalle.id_pago,
@@ -16,8 +20,8 @@ async def crear_detalle_pedido(detalle: DetallePedidoCreate):
         empleado_mod=detalle.empleado_mod
     )
     try:
-        last_record_id = await database.execute(query)
-        return {**detalle.dict(), "id_detalle_pedido": last_record_id}
+        await database.execute(query)
+        return {**detalle.dict(), "id_detalle_pedido": id_detalle_pedido}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al crear el detalle del pedido: {str(e)}")
 

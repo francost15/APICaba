@@ -1,12 +1,16 @@
 from fastapi import APIRouter, HTTPException
 from model.reseñas_productos import ResenaProductoCreate, ResenaProductoUpdate, ResenaProductoInDB, ResenasProducto
 from db import database
+import random
 
 router = APIRouter()
 
 @router.post("/resenas/", response_model=ResenaProductoInDB)
 async def crear_resena(resena: ResenaProductoCreate):
+    # Generar un ID aleatorio para la reseña
+    id_resena = random.randint(1, 1000000)
     query = ResenasProducto.insert().values(
+        id_resena=id_resena,
         id_cliente=resena.id_cliente,
         id_producto=resena.id_producto,
         calificacion=resena.calificacion,
@@ -15,8 +19,8 @@ async def crear_resena(resena: ResenaProductoCreate):
         empleado_mod=resena.empleado_mod
     )
     try:
-        last_record_id = await database.execute(query)
-        return await database.fetch_one(ResenasProducto.select().where(ResenasProducto.c.id_resena == last_record_id))
+        await database.execute(query)
+        return await database.fetch_one(ResenasProducto.select().where(ResenasProducto.c.id_resena == id_resena))
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al crear la reseña: {str(e)}")
 

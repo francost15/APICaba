@@ -1,4 +1,5 @@
 from sqlalchemy import Table, Column, Integer, String, DateTime, Boolean
+import random
 from sqlalchemy.sql import func
 from db import metadata
 from pydantic import BaseModel
@@ -9,7 +10,7 @@ from datetime import datetime
 Usuarios = Table(
     "Usuarios",
     metadata,
-    Column("id_usuario", Integer, primary_key=True),
+    Column("id_usuario", Integer, primary_key=True, default=lambda: random.randint(1, 1000000)),
     Column("nombre", String(50), nullable=False),
     Column("email", String(100), unique=True, nullable=False),
     Column("contraseña", String(255), nullable=False),

@@ -1,19 +1,23 @@
 from fastapi import APIRouter, HTTPException
 from model.rol import RolCreate, RolUpdate, RolInDB, Roles
 from db import database
+import random
 
 router = APIRouter()
 
 @router.post("/roles/", response_model=RolInDB)
 async def crear_rol(rol: RolCreate):
+    # Generar un ID aleatorio para el rol
+    id_rol = random.randint(1, 1000000)
     query = Roles.insert().values(
+        id_rol=id_rol,
         nombre_rol=rol.nombre_rol,
         status=rol.status,
         empleado_mod=rol.empleado_mod
     )
     try:
-        last_record_id = await database.execute(query)
-        return await database.fetch_one(Roles.select().where(Roles.c.id_rol == last_record_id))
+        await database.execute(query)
+        return await database.fetch_one(Roles.select().where(Roles.c.id_rol == id_rol))
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al crear el rol: {str(e)}")
 

@@ -1,5 +1,6 @@
 from fastapi import FastAPI
-from routers import cliente, carrito_compras, detalle_carrito, detalle_pedido, historial_compras, login_seguridad, metodo_pago, reseñas_productos, roles, usuarios,pedidos
+from fastapi.middleware.cors import CORSMiddleware
+from routers import cliente, carrito_compras, detalle_carrito, detalle_pedido, historial_compras, login_seguridad, metodo_pago, reseñas_productos, roles, usuarios, pedidos
 from db import connect_db, disconnect_db
 import logging
 
@@ -8,6 +9,15 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = FastAPI()
+
+# Configurar CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],  # Orígenes permitidos
+    allow_credentials=True,
+    allow_methods=["*"],  # Métodos permitidos
+    allow_headers=["*"],  # Headers permitidos
+)
 
 @app.on_event("startup")
 async def startup():
@@ -21,7 +31,7 @@ async def shutdown():
 
 @app.get("/")
 async def read_item():
-    return {"message":"Bienvenido"}
+    return {"message": "Bienvenido final"}
 
 app.include_router(cliente.router)
 app.include_router(carrito_compras.router)

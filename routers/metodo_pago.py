@@ -1,12 +1,16 @@
 from fastapi import APIRouter, HTTPException
 from model.metodo_pago import MetodoPagoCreate, MetodoPagoUpdate, MetodoPagoInDB, MetodoPago
 from db import database
+import random
 
 router = APIRouter()
 
 @router.post("/metodos_pago/", response_model=MetodoPagoInDB)
 async def crear_metodo_pago(metodo_pago: MetodoPagoCreate):
+    # Generar un ID aleatorio para el método de pago
+    id_pago = random.randint(1, 1000000)
     query = MetodoPago.insert().values(
+        id_pago=id_pago,
         id_cliente=metodo_pago.id_cliente,
         tipo_pago=metodo_pago.tipo_pago,
         nombre_titular=metodo_pago.nombre_titular,
@@ -17,8 +21,8 @@ async def crear_metodo_pago(metodo_pago: MetodoPagoCreate):
         empleado_mod=metodo_pago.empleado_mod
     )
     try:
-        last_record_id = await database.execute(query)
-        return {**metodo_pago.dict(), "id_pago": last_record_id}
+        await database.execute(query)
+        return {**metodo_pago.dict(), "id_pago": id_pago}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al crear el método de pago: {str(e)}")
 

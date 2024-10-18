@@ -2,6 +2,7 @@ from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime
 from sqlalchemy import Table, Column, Integer, Float, String, DateTime, Enum, ForeignKey
+import random
 from sqlalchemy.sql import func
 from db import metadata
 
@@ -9,11 +10,11 @@ from db import metadata
 HistorialCompras = Table(
     "HistorialCompras",
     metadata,
-    Column("id_historial", Integer, primary_key=True),
+    Column("id_historial", Integer, primary_key=True, default=lambda: random.randint(1, 1000000)),
     Column("id_cliente", Integer, ForeignKey("Clientes.id_cliente")),
     Column("id_pedido", Integer, ForeignKey("Pedidos.id_pedido")),
-    Column("total_compra", Float, nullable=False),
     Column("fecha_compra", DateTime, default=func.now()),
+    Column("total_compra", Float, nullable=False),
     Column("status", Enum("activo", "inactivo"), default="activo"),
     Column("empleado_mod", String(100))
 )

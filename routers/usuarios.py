@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException
 from model.usuario import UsuarioCreate, UsuarioUpdate, UsuarioInDB, Usuarios
 from db import database
 from passlib.context import CryptContext
+import random
 
 router = APIRouter()
 
@@ -13,11 +14,14 @@ def hash_password(password: str) -> str:
 
 @router.post("/usuarios/", response_model=UsuarioInDB)
 async def crear_usuario(usuario: UsuarioCreate):
+    # Generar un ID aleatorio para el usuario
+    id_usuario = random.randint(1, 1000000)
     usuario_dict = usuario.dict()
+    usuario_dict["id_usuario"] = id_usuario
     usuario_dict["contraseña"] = hash_password(usuario_dict["contraseña"])
     query = Usuarios.insert().values(**usuario_dict)
-    last_record_id = await database.execute(query)
-    return await database.fetch_one(Usuarios.select().where(Usuarios.c.id_usuario == last_record_id))
+    await database.execute(query)
+    return await database.fetch_one(Usuarios.select().where(Usuarios.c.id_usuario == id_usuario))
 
 @router.get("/usuarios/{usuario_id}", response_model=UsuarioInDB)
 async def leer_usuario(usuario_id: int):
@@ -40,7 +44,7 @@ async def actualizar_usuario(usuario_id: int, usuario: UsuarioUpdate):
     if db_usuario is None:
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
     
-    # Update only the fields that are provided
+    # Actualizar solo los campos proporcionados
     update_data = {k: v for k, v in usuario.dict(exclude_unset=True).items()}
     if "contraseña" in update_data:
         update_data["contraseña"] = hash_password(update_data["contraseña"])

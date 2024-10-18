@@ -2,6 +2,7 @@ from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime
 from sqlalchemy import Table, Column, Integer, String, Boolean, DateTime, ForeignKey
+import random
 from sqlalchemy.sql import func
 from db import metadata
 
@@ -9,13 +10,13 @@ from db import metadata
 LoginSeguridad = Table(
     "LoginSeguridad",
     metadata,
-    Column("id_login", Integer, primary_key=True),
+    Column("id_login", Integer, primary_key=True, default=lambda: random.randint(1, 1000000)),
     Column("id_cliente", Integer, ForeignKey("Clientes.id_cliente")),
+    Column("ultimo_login", DateTime, default=func.now(), onupdate=func.now()),
     Column("intentos_fallidos", Integer, default=0),
     Column("verificado", Boolean, default=False),
     Column("status", String(50), default="activo"),
     Column("empleado_mod", String(100), nullable=True),
-    Column("ultimo_login", DateTime, default=func.now(), onupdate=func.now())
 )
 
 # BaseModel para la seguridad del login

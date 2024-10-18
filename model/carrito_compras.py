@@ -1,14 +1,15 @@
 from sqlalchemy import Table, Column, Integer, DateTime, Numeric, Enum, ForeignKey, String
 from sqlalchemy.sql import func
+import random
+from db import metadata
 import datetime
 from typing import Optional
 from pydantic import BaseModel
-from db import metadata
 
 CarritoCompras = Table(
     "CarritoCompras",
     metadata,
-    Column("id_carrito", Integer, primary_key=True),
+    Column("id_carrito", Integer, primary_key=True, default=lambda: random.randint(1, 1000000)),
     Column("id_cliente", Integer, ForeignKey("Clientes.id_cliente")),
     Column("fecha_creacion", DateTime, default=func.now()),
     Column("total", Numeric(10, 2), nullable=False),
