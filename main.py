@@ -4,7 +4,6 @@ from routers import cliente, carrito_compras, detalle_carrito, detalle_pedido, h
 from db import connect_db, disconnect_db
 import logging
 
-# Configurar el logger
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -13,7 +12,7 @@ app = FastAPI()
 # Configurar CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # Orígenes permitidos
+    allow_origins=["https://shop-limpieza.vercel.app", "http://localhost:3000"],  # Orígenes permitidos
     allow_credentials=True,
     allow_methods=["*"],  # Métodos permitidos
     allow_headers=["*"],  # Headers permitidos
