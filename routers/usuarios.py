@@ -6,11 +6,7 @@ import random
 
 router = APIRouter()
 
-# Configuración de bcrypt
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-def hash_password(password: str) -> str:
-    return pwd_context.hash(password)
 
 @router.post("/usuarios/", response_model=UsuarioInDB)
 async def crear_usuario(usuario: UsuarioCreate):
@@ -18,7 +14,7 @@ async def crear_usuario(usuario: UsuarioCreate):
     id_usuario = random.randint(1, 1000000)
     usuario_dict = usuario.dict()
     usuario_dict["id_usuario"] = id_usuario
-    usuario_dict["contraseña"] = hash_password(usuario_dict["contraseña"])
+    usuario_dict["contraseña"] = (usuario_dict["contraseña"])
     query = Usuarios.insert().values(**usuario_dict)
     await database.execute(query)
     return await database.fetch_one(Usuarios.select().where(Usuarios.c.id_usuario == id_usuario))
@@ -47,7 +43,7 @@ async def actualizar_usuario(usuario_id: int, usuario: UsuarioUpdate):
     # Actualizar solo los campos proporcionados
     update_data = {k: v for k, v in usuario.dict(exclude_unset=True).items()}
     if "contraseña" in update_data:
-        update_data["contraseña"] = hash_password(update_data["contraseña"])
+        update_data["contraseña"] =(update_data["contraseña"])
     update_query = Usuarios.update().where(Usuarios.c.id_usuario == usuario_id).values(**update_data)
     await database.execute(update_query)
     
