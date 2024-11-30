@@ -25,6 +25,12 @@ async def crear_metodo_pago(metodo_pago: MetodoPagoCreate):
         return {**metodo_pago.dict(), "id_pago": id_pago}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al crear el método de pago: {str(e)}")
+# 2. Modificar el servicio de Metodo de pago para que devuelva el nombre del cliente
+@router.get("/metodos_pago/clientes/", response_model=list[MetodoPagoInDB])
+async def leer_metodos_pago_clientes():
+    query = MetodoPago.select().select_from(MetodoPago.join("clientes"))
+    metodos_pago = await database.fetch_all(query)
+    return metodos_pago
 
 @router.get("/metodos_pago/{metodo_pago_id}", response_model=MetodoPagoInDB)
 async def leer_metodo_pago(metodo_pago_id: int):
