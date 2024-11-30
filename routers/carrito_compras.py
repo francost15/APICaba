@@ -23,12 +23,14 @@ async def crear_carrito(carrito: CarritoComprasCreate):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al crear el carrito: {str(e)}")
 # 3. Modificar el servicio de carrito de compras para que devuelva los que el total es mayour a 1000
+# 3. Modificar el servicio de carrito de compras para que devuelva los que sus totales sean entre 1000 y 10000
 @router.get("/carritos/mayor_mil/", response_model=list[CarritoComprasInDB])
 async def leer_carritos_mayor_mil():
-    query = CarritoCompras.select().where(CarritoCompras.c.total > 1000)
-    db_carrito = await database.fetch_all(query)
-    if db_carrito is None:
-        raise HTTPException(status_code=404, detail="No se encontraron carritos con total mayor a 1000")
+    query = CarritoCompras.select().where(CarritoCompras.c.total.between(1000, 10000))
+    carritos = await database.fetch_all(query)
+    if carritos is None:
+        raise HTTPException(status_code=404, detail="No se encontraron carritos con total entre 1000 y 10000")
+    return carritos
         
 @router.get("/carritos/{carrito_id}", response_model=CarritoComprasInDB)
 async def leer_carrito(carrito_id: int):
