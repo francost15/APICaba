@@ -19,6 +19,13 @@ async def crear_login(login: LoginSeguridadCreate):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al crear el login: {str(e)}")
 
+# 5. Modificar el servicio de loginseguridad para que devuelva los usuarios que ingresaron del 1 d enoviembre de 2024 a la fecha de hoy 
+@router.get("/login/usuarios_ingresaron/", response_model=list[LoginSeguridadInDB])
+async def leer_usuarios_ingresaron():
+    query = LoginSeguridad.select().where(LoginSeguridad.c.fecha_ingreso >= '2024-11-01')
+    logins = await database.fetch_all(query)
+    return logins
+
 @router.get("/login/{login_id}", response_model=LoginSeguridadInDB)
 async def leer_login(login_id: int):
     query = LoginSeguridad.select().where(LoginSeguridad.c.id_login == login_id)
