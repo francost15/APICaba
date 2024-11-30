@@ -36,6 +36,14 @@ async def leer_cliente(cliente_id: int):
     if cliente is None:
         raise HTTPException(status_code=404, detail="Cliente no encontrado")
     return cliente
+# 1. Modificar el servicio de clientes para que devuelva el nombre del usuario y que su nombre empiece con la letra "A"
+@router.get("/clientes/nombres_a/", response_model=list[ClienteInDB])
+async def leer_clientes_nombres_a():
+    query = Clientes.select().where(Clientes.c.nombre.like('A%'))
+    clientes = await database.fetch_all(query)
+    if clientes is None:
+        raise HTTPException(status_code=404, detail="No se encontraron clientes con nombre que empiece con 'A'")
+    return clientes
 
 @router.get("/clientes/", response_model=list[ClienteInDB])
 async def leer_clientes():
