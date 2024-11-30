@@ -28,6 +28,14 @@ async def leer_rol(rol_id: int):
     if rol is None:
         raise HTTPException(status_code=404, detail="Rol no encontrado")
     return rol
+# 4. Modificar el servicio de roles para que devuelva los roles que empizan con la letra "A" y terminan con la letra "N"
+@router.get("/roles/nombres_a_n/", response_model=list[RolInDB])
+async def leer_roles_nombres_a_n():
+    query = Roles.select().where(Roles.c.nombre_rol.like('A%N'))
+    roles = await database.fetch_all(query)
+    if roles is None:
+        raise HTTPException(status_code=404, detail="No se encontraron roles con nombre que empiece con 'A' y termine con 'N'")
+    return roles
 
 @router.get("/roles/", response_model=list[RolInDB])
 async def leer_roles():
