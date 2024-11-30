@@ -23,6 +23,12 @@ async def crear_pedido(pedido: PedidoCreate):
         return pedido_creado
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al crear el pedido: {str(e)}")
+# 7. Modificar el servicio de pedidos para que devuelva los que sus totales sean entre 1000 y 10000
+@router.get("/pedidos/totales_entre/", response_model=list[PedidoInDB])
+async def leer_pedidos_totales_entre():
+    query = Pedidos.select().where(Pedidos.c.total_pedido.between(1000, 10000))
+    pedidos = await database.fetch_all(query)
+    return pedidos
 
 @router.get("/pedidos/{pedido_id}", response_model=PedidoInDB)
 async def leer_pedido(pedido_id: int):
