@@ -28,7 +28,7 @@ async def crear_metodo_pago(metodo_pago: MetodoPagoCreate):
 # 2. Modificar el servicio de Metodo de pago para que devuelva el nombre del cliente
 @router.get("/metodos_pago/clientes/", response_model=list[MetodoPagoInDB])
 async def leer_metodos_pago_clientes():
-    query = MetodoPago.select().select_from(MetodoPago.join("clientes"))
+    query = MetodoPago.select().select_from(MetodoPago.join(Clientes, on=MetodoPago.c.id_cliente == Clientes.c.id_cliente))
     metodos_pago = await database.fetch_all(query)
     return metodos_pago
 
