@@ -8,13 +8,14 @@ router = APIRouter()
 
 
 # Modificar el servicio de Usuarios para que devuelva los que tiene rol de capturista y con estado Activo
+# Modificar el servicio de Usuarios para que devuelva los que tiene rol de capturista y con estado Activo
 @router.get("/usuarios/roles_capturista/", response_model=list[UsuarioInDB])
 async def leer_usuarios_roles_capturista():
-    query = Usuarios.select().where(Usuarios.c.rol == 'capturista').where(Usuarios.c.status == 'Activo')
+    query = Usuarios.select().where(Usuarios.c.rol == 'capturistas').where(Usuarios.c.status == 'activo')
     usuarios = await database.fetch_all(query)
     if usuarios is None:
         raise HTTPException(status_code=404, detail="No se encontraron usuarios con rol de capturista y estado activo")
-
+    return usuarios
 
 @router.post("/usuarios/", response_model=UsuarioInDB)
 async def crear_usuario(usuario: UsuarioCreate):
